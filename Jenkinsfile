@@ -4,7 +4,8 @@ pipeline {
     environment {
         AWS_REGION = 'ap-south-2'
         ECR_REPO = '546517268801.dkr.ecr.ap-south-2.amazonaws.com/hotel-booking'
-        VITE_API_BASE_URL = 'http://18.61.80.207:5001'
+        VITE_API_BASE_URL = 'http://16.113.20.120:5001'
+        APP_DIR = '/home/ubuntu/hotel-booking-devops/Hotel-Booking-Management-System--React-MERN-FullStack'
     }
 
     stages {
@@ -35,6 +36,26 @@ pipeline {
 
                     docker push $ECR_REPO:frontend-$BUILD_NUMBER
                     docker push $ECR_REPO:backend-$BUILD_NUMBER
+                '''
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh '''
+                    cd $APP_DIR
+                    git pull origin main
+                    IMAGE_TAG=$BUILD_NUMBER docker-compose pull
+                    IMAGE_TAG=$BUILD_NUMBER docker-compose up -d
+                '''
+            }
+        }
+
+        stage('Health Check') {
+            steps {
+                sh '''
+                    sleep 15
+                    curl -f http://localhost:5001/api/health
                 '''
             }
         }
