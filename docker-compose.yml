@@ -1,0 +1,21 @@
+services:
+  frontend:
+    image: 546517268801.dkr.ecr.ap-south-2.amazonaws.com/hotel-booking:frontend-${IMAGE_TAG:-v2}
+    container_name: hotel-frontend
+    ports:
+      - "80:80"
+    restart: unless-stopped
+
+  backend:
+    image: 546517268801.dkr.ecr.ap-south-2.amazonaws.com/hotel-booking:backend-${IMAGE_TAG:-v2}
+    container_name: hotel-backend
+    ports:
+      - "5001:5001"
+    env_file:
+      - hotel-booking-backend/.env
+    environment:
+      NODE_ENV: production
+      PORT: 5001
+      FRONTEND_URL: http://18.61.80.207
+      BACKEND_URL: http://18.61.80.207:5001
+    restart: unless-stopped
