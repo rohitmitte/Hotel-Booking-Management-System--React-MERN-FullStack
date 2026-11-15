@@ -45,8 +45,8 @@ pipeline {
                 sh '''
                     cd $APP_DIR
                     git pull origin main
-                    IMAGE_TAG=$BUILD_NUMBER docker-compose pull
-                    IMAGE_TAG=$BUILD_NUMBER docker-compose up -d
+                    IMAGE_TAG=$BUILD_NUMBER docker compose pull
+                    IMAGE_TAG=$BUILD_NUMBER docker compose up -d
                 '''
             }
         }
