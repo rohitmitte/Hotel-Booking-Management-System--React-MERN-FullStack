@@ -6,6 +6,9 @@ pipeline {
         ECR_REPO = '546517268801.dkr.ecr.ap-south-2.amazonaws.com/hotel-booking'
         VITE_API_BASE_URL = 'http://16.113.20.120:5001'
         APP_DIR = '/home/ubuntu/hotel-booking-devops/Hotel-Booking-Management-System--React-MERN-FullStack'
+        KUBECONFIG = '/var/lib/jenkins/.kube/config'
+        MINIKUBE_HOME = '/home/ubuntu/.minikube'
+        DOCKER_CONFIG = '/var/lib/jenkins/.docker'
     }
 
     stages {
@@ -56,6 +59,21 @@ pipeline {
                 sh '''
                     sleep 15
                     curl -f http://localhost:5001/api/health
+                '''
+            }
+        }
+
+        stage('Deploy Backend to Kubernetes') {
+            steps {
+                sh '''
+                    echo "Loading backend image into Minikube"
+                    minikube image load $ECR_REPO:backend-$BUILD_NUMBER
+
+                    echo "Updating Kubernetes backend"
+                    kubectl set image deployment/hotel-backend \
+                    backend=$ECR_REPO:backend-$BUILD_NUMBER
+
+                    kubectl rollout status deployment/hotel-backend --timeout=180s
                 '''
             }
         }
