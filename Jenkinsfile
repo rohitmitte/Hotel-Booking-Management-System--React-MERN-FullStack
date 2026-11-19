@@ -77,5 +77,19 @@ pipeline {
                 '''
             }
         }
+                 stage('Deploy Frontend to Kubernetes') {
+            steps {
+                sh '''
+                    echo "Loading frontend image into Minikube"
+                    minikube image load $ECR_REPO:frontend-$BUILD_NUMBER
+
+                    echo "Updating Kubernetes frontend"
+                    kubectl set image deployment/hotel-frontend \
+                    frontend=$ECR_REPO:frontend-$BUILD_NUMBER
+
+                    kubectl rollout status deployment/hotel-frontend --timeout=180s
+                '''
+            }
+        }
     }
 }
